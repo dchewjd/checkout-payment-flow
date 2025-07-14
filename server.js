@@ -8,6 +8,7 @@ app.use(express.json());
 // Insert your secret key here
 const SECRET_KEY = process.env.CHECKOUT_SECRET_KEY;
 const PROCESSING_CHANNEL_ID = process.env.PROCESSING_CHANNEL_ID;
+const BASE_URL = process.env.RENDER_EXTERNAL_URL || 'http://localhost:3000';
 
 app.post("/create-payment-sessions", async (_req, res) => {
   // Create a PaymentSession
@@ -53,8 +54,8 @@ app.post("/create-payment-sessions", async (_req, res) => {
     risk: {
       enabled: true,
     },
-    success_url: "http://localhost:3000/?status=succeeded",
-    failure_url: "http://localhost:3000/?status=failed",
+    success_url: `${BASE_URL}/?status=succeeded`,
+    failure_url: `${BASE_URL}/?status=failed`,
     metadata: {},
     items: [
       {
@@ -121,8 +122,8 @@ app.post("/create-payment-sessions", async (_req, res) => {
         risk: {
           enabled: true,
         },
-        success_url: "http://localhost:3000/?status=succeeded",
-        failure_url: "http://localhost:3000/?status=failed",
+        success_url: `${BASE_URL}/?status=succeeded`,
+        failure_url: `${BASE_URL}/?status=failed`,
         metadata: {},
         items: [
           {
@@ -146,6 +147,7 @@ app.post("/create-payment-sessions", async (_req, res) => {
   res.status(request.status).send(parsedPayload);
 });
 
-app.listen(3000, () =>
-  console.log("Node server listening on port 3000: http://localhost:3000/")
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () =>
+  console.log(`Node server listening on port ${PORT}: ${BASE_URL}/`)
 );
