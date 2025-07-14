@@ -24,6 +24,10 @@ document.getElementById('billing-form').addEventListener('submit', async (e) => 
   submitBtn.textContent = 'Processing...';
   
   try {
+    // Hide billing form and show loading spinner
+    document.querySelector('.billing-section').style.display = 'none';
+    document.getElementById('loading-section').style.display = 'block';
+    
     // Create payment session with billing data
     const response = await fetch("/create-payment-sessions", {
       method: "POST",
@@ -37,12 +41,15 @@ document.getElementById('billing-form').addEventListener('submit', async (e) => 
 
     if (!response.ok) {
       console.error("Error creating payment session", paymentSession);
+      // Hide loading and show billing form again on error
+      document.getElementById('loading-section').style.display = 'none';
+      document.querySelector('.billing-section').style.display = 'block';
       alert('Error creating payment session. Please try again.');
       return;
     }
 
-    // Hide billing form and show payment section
-    document.querySelector('.billing-section').style.display = 'none';
+    // Hide loading and show payment section
+    document.getElementById('loading-section').style.display = 'none';
     document.getElementById('payment-section').style.display = 'block';
     
     // Initialize Checkout Web Components
@@ -50,6 +57,9 @@ document.getElementById('billing-form').addEventListener('submit', async (e) => 
     
   } catch (error) {
     console.error('Error:', error);
+    // Hide loading and show billing form again on error
+    document.getElementById('loading-section').style.display = 'none';
+    document.querySelector('.billing-section').style.display = 'block';
     alert('An error occurred. Please try again.');
   } finally {
     // Reset button state
