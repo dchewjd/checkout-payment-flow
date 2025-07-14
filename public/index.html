@@ -16,13 +16,102 @@
             <span>The payment failed, try again</span>
         </div>
 
-        <form>
+        <!-- Product Display -->
+        <div class="product-section">
+            <h2>Order Summary</h2>
+            <div class="product-item">
+                <div class="product-image">
+                    <img src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iODAiIGhlaWdodD0iODAiIHZpZXdCb3g9IjAgMCA4MCA4MCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHJlY3Qgd2lkdGg9IjgwIiBoZWlnaHQ9IjgwIiByeD0iOCIgZmlsbD0iI0Y1RjVGNSIvPgo8cGF0aCBkPSJNMjAgNDVINjBNMjAgNDVMMzAgMzVNMjAgNDVMMzAgNTVNNjAgNDVMNTAgMzVNNjAgNDVMNTAgNTUiIHN0cm9rZT0iIzk5OTk5OSIgc3Ryb2tlLXdpZHRoPSIyIiBzdHJva2UtbGluZWNhcD0icm91bmQiIHN0cm9rZS1saW5lam9pbj0icm91bmQiLz4KPC9zdmc+" alt="Premium Running Shoes" />
+                </div>
+                <div class="product-details">
+                    <h3 class="product-name">Premium Running Shoes</h3>
+                    <p class="product-variant">Size: US 9 | Color: Black</p>
+                    <div class="product-pricing">
+                        <span class="quantity">Qty: 1</span>
+                        <span class="price">S$100.00</span>
+                    </div>
+                </div>
+            </div>
+            <div class="order-total">
+                <div class="total-row">
+                    <span>Subtotal</span>
+                    <span>S$100.00</span>
+                </div>
+                <div class="total-row">
+                    <span>Shipping</span>
+                    <span>Free</span>
+                </div>
+                <div class="total-row final-total">
+                    <span>Total</span>
+                    <span>S$100.00</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Billing Information Form -->
+        <div class="billing-section">
+            <h2>Billing Information</h2>
+            <form id="billing-form">
+                <div class="form-group">
+                    <label for="name">Full Name *</label>
+                    <input type="text" id="name" name="name" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="email">Email Address *</label>
+                    <input type="email" id="email" name="email" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="address1">Address Line 1 *</label>
+                    <input type="text" id="address1" name="address1" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="address2">Address Line 2</label>
+                    <input type="text" id="address2" name="address2" placeholder="Optional">
+                </div>
+                
+                <div class="form-group">
+                    <label for="city">City *</label>
+                    <input type="text" id="city" name="city" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="zip">Postal Code *</label>
+                    <input type="text" id="zip" name="zip" required placeholder="123456">
+                </div>
+                
+                <div class="form-group">
+                    <label for="country">Country *</label>
+                    <select id="country" name="country" required>
+                        <option value="SG">Singapore</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label for="phone">Phone Number *</label>
+                    <div class="phone-input">
+                        <select id="phone-country" name="phone-country" required>
+                            <option value="+65">+65 (SG)</option>
+                        </select>
+                        <input type="tel" id="phone" name="phone" required placeholder="9123 4567">
+                    </div>
+                </div>
+                
+                <button type="submit" class="checkout-btn">Proceed to Payment</button>
+            </form>
+        </div>
+
+        <!-- Payment Section (initially hidden) -->
+        <div class="payment-section" id="payment-section" style="display: none;">
+            <h2>Payment</h2>
             <div class="container">
                 <div id="flow-container"></div>
             </div>
             <span id="error-message"></span>
             <span id="successful-payment-message"></span>
-        </form>
+        </div>
 
         <script src="https://checkout-web-components.checkout.com/index.js"></script>
 

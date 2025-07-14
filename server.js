@@ -1,3 +1,4 @@
+require('dotenv').config({ path: '.env.local' });
 const express = require("express");
 const fetch = require("node-fetch");
 const app = express();
@@ -8,47 +9,50 @@ app.use(express.json());
 // Insert your secret key here
 const SECRET_KEY = process.env.CHECKOUT_SECRET_KEY;
 const PROCESSING_CHANNEL_ID = process.env.PROCESSING_CHANNEL_ID;
-const BASE_URL = process.env.RENDER_EXTERNAL_URL || 'http://localhost:3000';
+const BASE_URL = process.env.RENDER_EXTERNAL_URL;
 
-app.post("/create-payment-sessions", async (_req, res) => {
-  // Create a PaymentSession
-  console.log("Request params:", JSON.stringify({
-    amount: 6540,
-    currency: "GBP",
-    reference: "ORD-123A",
-    description: "Payment for Guitars and Amps",
+app.post("/create-payment-sessions", async (req, res) => {
+  // Get billing data from request body
+  const billingData = req.body;
+
+  // Create payment session data using user input
+  const paymentSessionData = {
+    amount: 10000, // S$100.00 in cents
+    currency: "SGD",
+    reference: "SHOES-001",
+    description: "Payment for Premium Running Shoes",
     billing_descriptor: {
-      name: "Jia Tsang",
-      city: "London",
+      name: billingData.name,
+      city: billingData.city,
     },
     customer: {
-      email: "jia.tsang@example.com",
-      name: "Jia Tsang",
+      email: billingData.email,
+      name: billingData.name,
     },
     shipping: {
       address: {
-        address_line1: "123 High St.",
-        address_line2: "Flat 456",
-        city: "London",
-        zip: "SW1A 1AA",
-        country: "GB",
+        address_line1: billingData.address1,
+        address_line2: billingData.address2,
+        city: billingData.city,
+        zip: billingData.zip,
+        country: billingData.country,
       },
       phone: {
-        number: "1234567890",
-        country_code: "+44",
+        number: billingData.phone,
+        country_code: billingData.phoneCountry,
       },
     },
     billing: {
       address: {
-        address_line1: "123 High St.",
-        address_line2: "Flat 456",
-        city: "London",
-        zip: "SW1A 1AA",
-        country: "GB",
+        address_line1: billingData.address1,
+        address_line2: billingData.address2,
+        city: billingData.city,
+        zip: billingData.zip,
+        country: billingData.country,
       },
       phone: {
-        number: "1234567890",
-        country_code: "+44",
+        number: billingData.phone,
+        country_code: billingData.phoneCountry,
       },
     },
     risk: {
@@ -59,95 +63,44 @@ app.post("/create-payment-sessions", async (_req, res) => {
     metadata: {},
     items: [
       {
-        name: "Guitar",
+        name: "Premium Running Shoes",
         quantity: 1,
-        unit_price: 1635,
-      },
-      {
-        name: "Amp",
-        quantity: 3,
-        unit_price: 1635,
+        unit_price: 10000, // S$100.00 in cents
       },
     ],
     processing_channel_id: `${PROCESSING_CHANNEL_ID}`
-  }, null, 2));
+  };
   
-  const request = await fetch(
-    "https://api.sandbox.checkout.com/payment-sessions",
-    {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${SECRET_KEY}`,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        amount: 6540,
-        currency: "GBP",
-        reference: "ORD-123A",
-        description: "Payment for Guitars and Amps",
-        billing_descriptor: {
-          name: "Jia Tsang",
-          city: "London",
+  console.log("Request params:", JSON.stringify(paymentSessionData, null, 2));
+  
+  try {
+    const request = await fetch(
+      "https://api.sandbox.checkout.com/payment-sessions",
+      {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${SECRET_KEY}`,
+          "Content-Type": "application/json",
         },
-        customer: {
-          email: "jia.tsang@example.com",
-          name: "Jia Tsang",
-        },
-        shipping: {
-          address: {
-            address_line1: "123 High St.",
-            address_line2: "Flat 456",
-            city: "London",
-            zip: "SW1A 1AA",
-            country: "GB",
-          },
-          phone: {
-            number: "1234567890",
-            country_code: "+44",
-          },
-        },
-        billing: {
-          address: {
-            address_line1: "123 High St.",
-            address_line2: "Flat 456",
-            city: "London",
-            zip: "SW1A 1AA",
-            country: "GB",
-          },
-          phone: {
-            number: "1234567890",
-            country_code: "+44",
-          },
-        },
-        risk: {
-          enabled: true,
-        },
-        success_url: `${BASE_URL}/?status=succeeded`,
-        failure_url: `${BASE_URL}/?status=failed`,
-        metadata: {},
-        items: [
-          {
-            name: "Guitar",
-            quantity: 1,
-            unit_price: 1635,
-          },
-          {
-            name: "Amp",
-            quantity: 3,
-            unit_price: 1635,
-          },
-        ],
-        processing_channel_id: `${PROCESSING_CHANNEL_ID}`
-      }),
+        body: JSON.stringify(paymentSessionData),
+      }
+    );
+
+    const parsedPayload = await request.json();
+    
+    if (!request.ok) {
+      console.error("Checkout.com API Error:", parsedPayload);
+      return res.status(request.status).send(parsedPayload);
     }
-  );
 
-  const parsedPayload = await request.json();
-
-  res.status(request.status).send(parsedPayload);
+    res.status(request.status).send(parsedPayload);
+  } catch (error) {
+    console.error("Server Error:", error);
+    res.status(500).send({ error: "Internal server error" });
+  }
 });
 
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT;
 app.listen(PORT, () =>
   console.log(`Node server listening on port ${PORT}: ${BASE_URL}/`)
 );
